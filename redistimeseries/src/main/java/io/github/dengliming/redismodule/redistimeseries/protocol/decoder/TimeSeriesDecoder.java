@@ -28,46 +28,54 @@ import java.util.List;
  */
 public class TimeSeriesDecoder implements MultiDecoder<List<TimeSeries>> {
 
-    private LabelDecoder labelDecoder = new LabelDecoder();
-    private ValueDecoder valueDecoder = new ValueDecoder();
+	private LabelDecoder labelDecoder = new LabelDecoder();
+	private ValueDecoder valueDecoder = new ValueDecoder();
 
-    @Override
-    public Decoder<Object> getDecoder(int paramNum, State state) {
-        return null;
-    }
+	@Override
+	public Decoder<Object> getDecoder(int paramNum, State state) {
+		return null;
+	}
 
-    /**
-     * [temperature:2:33, [[label1, test], [label2, test1]], [1588266627081, 13]]
-     *
-     * @param parts
-     * @param state
-     * @return
-     */
-    @Override
-    public List<TimeSeries> decode(List<Object> parts, State state) {
-        if (parts == null) {
-            return null;
-        }
-        List<TimeSeries> timeSeries = new ArrayList<>(parts.size());
-        for (Object part : parts) {
-            List<Object> o = (List) part;
-            TimeSeries series = new TimeSeries((String) o.get(0));
-            series.labels(labelDecoder.decode((List<Object>) o.get(1), state));
+	/**
+	 * [temperature:2:33, [[label1, test], [label2, test1]], [1588266627081,
+	 * 13]]
+	 *
+	 * @param parts
+	 * @param state
+	 * @return
+	 */
+	@Override
+	public List<TimeSeries> decode(List<Object> parts, State state) {
+		if (parts == null) {
+			return null;
+		}
+		List<TimeSeries> timeSeries = new ArrayList<>(parts.size());
+		for (Object part : parts) {
+			List<Object> o = (List) part;
+			TimeSeries series = new TimeSeries((String) o.get(0));
+			series.labels(labelDecoder.decode((List<Object>) o.get(1), state));
 
-            List<Value> values = new ArrayList<>();
-            List<Object> objects = (List<Object>) o.get(2);
-            // all samples
-            if (objects.get(0) instanceof List) {
-                ((List<List<Object>>) o.get(2)).forEach(valueObject -> values.add(valueDecoder.decode(valueObject, state)));
-            }
-            // the last sample
-            else {
-                values.add(valueDecoder.decode((List<Object>) o.get(2), state));
-            }
-            series.values(values);
-            timeSeries.add(series);
-        }
+			List<Value> values = new ArrayList<>();
+			List<Object> objects = (List<Object>) o.get(2);
 
-        return timeSeries;
-    }
+			if (objects != null && !objects.isEmpty() && objects.get(0) != null) {
+				if (objects.get(0) instanceof List) {
+					((List<List<Object>>) o.get(2)).forEach(valueObject -> values.add(valueDecoder.decode(valueObject, state)));
+				}
+			} // the last sample
+
+//			// all samples
+//				if (objects.get(0) instanceof List) {
+//					((List<List<Object>>) o.get(2)).forEach(valueObject -> values.add(valueDecoder.decode(valueObject, state)));
+//				}
+//			 // the last sample
+			else {
+				values.add(valueDecoder.decode((List<Object>) o.get(2), state));
+			}
+			series.values(values);
+			timeSeries.add(series);
+		}
+
+		return timeSeries;
+	}
 }
