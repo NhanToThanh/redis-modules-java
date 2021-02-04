@@ -5,10 +5,9 @@
  */
 package io.github.dengliming.redismodule.redistimeseries;
 
+import io.github.dengliming.redismodule.redistimeseries.Sample.Value;
 import io.github.dengliming.redismodule.redistimeseries.client.RedisTimeSeriesClient;
-import java.util.concurrent.TimeUnit;
 import org.junit.Test;
-import static org.junit.Assert.*;
 import org.redisson.config.Config;
 
 /**
@@ -27,9 +26,10 @@ public class RedisTimeSeriesTest {
 
 	@Test
 	public void testSomeMethod() {
-		boolean expire = redisTimeSeries.expire("key1", 600000, TimeUnit.SECONDS);
+		long ts = 1612352460000L;
+		Long add = redisTimeSeries.add(new Sample("key2", Value.of(ts, 456)), new TimeSeriesOptions().dupPolicy(DupPolicy.LAST));
 		
-		System.out.println(expire);
+		System.out.println(add);
 	}
 
 }

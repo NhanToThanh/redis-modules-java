@@ -26,6 +26,7 @@ public class TimeSeriesOptions {
 
     private long retentionTime;
     private boolean unCompressed;
+	private DupPolicy dupPolicy = null;
     private Label[] labels;
 
     public TimeSeriesOptions retentionTime(long retentionTime) {
@@ -37,6 +38,11 @@ public class TimeSeriesOptions {
         this.unCompressed = true;
         return this;
     }
+	
+	public TimeSeriesOptions dupPolicy(DupPolicy dupPolicy) {
+		this.dupPolicy = dupPolicy;
+		return this;
+	}
 
     public TimeSeriesOptions labels(Label... labels) {
         this.labels = labels;
@@ -52,6 +58,11 @@ public class TimeSeriesOptions {
         if (unCompressed) {
             args.add(Keywords.UNCOMPRESSED);
         }
+		
+		if (dupPolicy != null) {
+			args.add(Keywords.ON_DUPLICATE);
+			args.add(dupPolicy);
+		}
 
         if (labels != null) {
             args.add(Keywords.LABELS);
