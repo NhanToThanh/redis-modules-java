@@ -27,6 +27,8 @@ import java.util.List;
 import java.util.Map;
 
 import static io.github.dengliming.redismodule.redistimeseries.protocol.RedisCommands.*;
+import java.util.concurrent.TimeUnit;
+import org.redisson.client.protocol.RedisCommands;
 
 /**
  * @author dengliming
@@ -39,6 +41,14 @@ public class RedisTimeSeries {
     public RedisTimeSeries(CommandAsyncExecutor commandExecutor) {
         this.commandExecutor = commandExecutor;
         this.codec = commandExecutor.getConnectionManager().getCodec();
+    }
+	
+	public boolean expire(String key, long timeToLive, TimeUnit timeUnit) {
+        return commandExecutor.get(expireAsync(key, timeToLive, timeUnit));
+    }
+	
+	public RFuture<Boolean> expireAsync(String key, long timeToLive, TimeUnit timeUnit) {
+        return commandExecutor.writeAsync(getName(), codec, RedisCommands.PEXPIRE, key, timeUnit.toMillis(timeToLive));
     }
 
     /**
